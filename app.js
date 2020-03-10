@@ -174,7 +174,7 @@ app.get('/log', (req, res) => {
     console.log("gLog reqest", req.session);
     if (!req.session.uid)
         return res.redirect("/loginP")
-    res.render('logout');
+    res.redirect('/');
 });
 app.post('/login', (req, res) => {
     const e = req.body.email;
