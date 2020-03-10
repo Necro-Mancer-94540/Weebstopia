@@ -26,6 +26,17 @@
     #default-search {
       min-height: 75vh;
     }
+    .makebuttonlink{
+      background: none!important;
+      border: none;
+      padding: 0!important;
+      /*optional*/
+      font-family: arial, sans-serif;
+      /*input has OS specific font-family*/
+      color: #069;
+      text-decoration: none;
+      cursor: pointer;
+  }
   </style>
 
 </head>
@@ -43,7 +54,7 @@
     <img id="loader" src="loader.gif" alt="Loading..." />
   </div>
 
-  <div id="display-container" class="container-fluid d-flex justify-content-around">
+  <div id="display-container" class="container-fluid">
     <div id="default-search" class="d-flex align-items-center justify-content-center">
       <p class="h6 text-muted">Your search will appear here...</p>
     </div>
