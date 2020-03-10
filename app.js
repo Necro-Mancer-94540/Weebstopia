@@ -3,10 +3,12 @@
 
 const express = require('express');
 const ejs = require("ejs");
-const session = require('express-session')
+const session = require('express-session');
 const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
 var crypto = require('crypto');
+const fs=require('fs');
+const upload=require('express-fileupload');
 
 /*------------------------Initialize Modules-------------------------*/
 
@@ -17,8 +19,6 @@ mongoose.connect("mongodb+srv://terminator:testdb@accounts-0uu7d.mongodb.net/Use
 });
 app.use(session({
     secret: "Shh, its a secret!",
-    resave: true,
-    saveUninitialized: true
 }));
 app.set('view engine', 'ejs');
 app.use(express.static('public/index'));
@@ -27,6 +27,65 @@ app.use(express.static('public/upload'));
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+app.use(upload());
+
+/*--------------------settings-----------------*/
+
+app.get('/settings',function(req,res){
+    console.log(req.session);
+    res.render("settings",{img:req.session.img});
+});
+
+app.post('/download',function(req,res){
+    console.log(req.files);
+    if(req.files)
+    {
+        console.log(req.files);
+        var file=req.files.myfile;
+        console.log(file);
+        var index;
+        var filename=file.name;
+        for(i=filename.length-1;i>=0;i--)
+        if(filename[i]=='.')
+        {
+            index=i;
+            console.log(i);
+            break;
+        }
+        var indextemp;
+        var filenametemp=req.session.img;
+        for(i=filenametemp.length-1;i>=0;i--)
+        if(filenametemp[i]=='.')
+        {
+            indextemp=i;
+            console.log(i);
+            break;
+        }
+        console.log(req.session);
+        file.name=req.session.img.slice(0,indextemp)+filename.slice(index);
+        filename=file.name;
+        fs.unlink('./public/upload/'+req.session.img, (err) => {
+            if (err) throw err;
+            console.log('successfully deleted image');
+          });
+          req.session.img=filename;
+        file.mv("./public/upload/"+file.name,function(err){
+            if(err)
+            res.send("Error");
+            else
+            res.render('settings',{img:filename});
+        });
+    }
+});
+
+/*-------------------save profile----------------------*/
+
+app.post('/saveprofile',function(req,res){
+    users.updateOne({_id:req.session.uid}, { $set: { image: req.session.img } },function(err,user){
+        console.log(user);
+    });
+    res.redirect("/");
+});
 
 /*--------------Create schema for mongodb---------------------*/
 
@@ -157,6 +216,8 @@ app.post('/login', (req, res) => {
             } else if (user.email === e && user.password === hvalue) {
 
                 req.session.uid = user.id;
+                req.session.img=user.image;
+                req.session.fullName=user.fullName;
                 console.log("setting cookie", req.session, user);
                 res.send({
                     "successfull": true
