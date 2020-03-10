@@ -32,8 +32,14 @@ app.use(upload());
 /*--------------------settings-----------------*/
 
 app.get('/settings',function(req,res){
-    console.log(req.session);
-    res.render("settings",{img:req.session.img});
+    if(req.session.uid)
+    {
+        console.log(req.session);
+        res.render("settings",{img:req.session.img});
+    }
+    else{
+        res.redirect("/loginP");
+    }
 });
 
 app.post('/download',function(req,res){
@@ -134,32 +140,6 @@ app.post('/searchuser',(req,res)=>{
     });
 });
 
-/*-------------------show profile-----------------------*/
-
-app.post('/showprofile',(req,res)=>{
-    console.log(req.body);
-    users.findOne({_id: req.body["hello"]},function(err,user){
-        res.redirect("/"+user.fullName)
-        console.log(user);
-});
-});
-
-app.get("/:customListName",function(req,res){
-    users.findOne({fullName:req.params.customListName},function(err,results){
-        if(!err){
-            if(!results){
-                res.redirect("/");
-            } else {
-                res.render("profile", {
-                    name: results.fullName,
-                    image: results.image
-                });
-            }
-        }
-    });
-    console.log(req.params.customListName);
-});
-
 
 /*---------------------sign up---------------------*/
 
@@ -241,6 +221,32 @@ app.post('/login', (req, res) => {
 app.post("/logOut", (req, res) => {
     req.session.destroy();
     res.redirect("/");
+});
+
+/*-------------------show profile-----------------------*/
+
+app.post('/showprofile',(req,res)=>{
+    console.log(req.body);
+    users.findOne({_id: req.body["hello"]},function(err,user){
+        res.redirect("/"+user.fullName)
+        console.log(user);
+});
+});
+
+app.get("/:customListName",function(req,res){
+    users.findOne({fullName:req.params.customListName},function(err,results){
+        if(!err){
+            if(!results){
+                res.redirect("/");
+            } else {
+                res.render("profile", {
+                    name: results.fullName,
+                    image: results.image
+                });
+            }
+        }
+    });
+    console.log(req.params.customListName);
 });
 
 /*----------starting server-----------------*/
