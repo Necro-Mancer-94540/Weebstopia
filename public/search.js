@@ -1,7 +1,10 @@
 $("#loader").hide(0);
 $("#next-button").hide(0);
 $("#previous-button").hide(0);
-
+function add(id){
+  console.log(id);
+  $.post('/add/' + id);
+}
 $(document).ready(function () {
 
   var content = "";
@@ -96,10 +99,6 @@ $(document).ready(function () {
         $("#next-button").prop("disabled", false);
       });
 
-  }
-
-  function add(id){
-    $.post('/add/' + id);
   }
 
 });
