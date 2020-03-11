@@ -44,6 +44,7 @@ app.get('/settings',function(req,res){
     }
 });
 var file;
+var flag=0;
 app.post('/download',function(req,res){
     if(req.files)
     {
@@ -56,6 +57,9 @@ app.post('/download',function(req,res){
             else
             res.render('settings',{img:file.name});
         });
+    }
+    else{
+        file=req.files;
     }
 });
 
@@ -100,6 +104,8 @@ app.post('/download',function(req,res){
 /*-------------------save profile----------------------*/
 
 app.post('/saveprofile',function(req,res){
+    if(!file)
+    return setTimeout(function(){ res.redirect("/"); }, 3000);
     var index;
     for(i=file.name.length-1;i>=0;i--)
     if(file.name[i]=='.')
