@@ -9,6 +9,7 @@ const mongoose = require("mongoose");
 var crypto = require('crypto');
 const fs=require('fs');
 const upload=require('express-fileupload');
+const path = require('path');
 
 /*------------------------Initialize Modules-------------------------*/
 
@@ -23,6 +24,7 @@ app.use(session({
 app.set('view engine', 'ejs');
 app.use(express.static('public/index'));
 app.use(express.static('public/upload'));
+app.use(express.static('downloads'));
 
 app.use(bodyParser.urlencoded({
     extended: true
@@ -41,21 +43,34 @@ app.get('/settings',function(req,res){
         res.redirect("/loginP");
     }
 });
-
+var file;
 app.post('/download',function(req,res){
-    console.log(req.files);
     if(req.files)
     {
         console.log(req.files);
+        file=req.files.myfile;
+        file.name="d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa"+file.name;
+        file.mv("./downloads/"+file.name,function(err){
+            if(err)
+            res.send("Error");
+            else
+            res.render('settings',{img:file.name});
+        });
+    }
+});
+
+
+/*app.post('/test',function(req,res){
+    console.log(req.files);
+    if(req.files)
+    {
         var file=req.files.myfile;
-        console.log(file);
         var index;
         var filename=file.name;
         for(i=filename.length-1;i>=0;i--)
         if(filename[i]=='.')
         {
             index=i;
-            console.log(i);
             break;
         }
         var indextemp;
@@ -64,10 +79,8 @@ app.post('/download',function(req,res){
         if(filenametemp[i]=='.')
         {
             indextemp=i;
-            console.log(i);
             break;
         }
-        console.log(req.session);
         file.name=req.session.img.slice(0,indextemp)+filename.slice(index);
         filename=file.name;
         fs.unlink('./public/upload/'+req.session.img, (err) => {
@@ -75,18 +88,55 @@ app.post('/download',function(req,res){
             console.log('successfully deleted image');
           });
           req.session.img=filename;
-        file.mv("./public/upload/"+file.name,function(err){
+        file.mv("./public/download/"+file.name,function(err){
             if(err)
             res.send("Error");
             else
             res.render('settings',{img:filename});
         });
     }
-});
+});*/
 
 /*-------------------save profile----------------------*/
 
 app.post('/saveprofile',function(req,res){
+    var index;
+    for(i=file.name.length-1;i>=0;i--)
+    if(file.name[i]=='.')
+    {
+        index=i;
+        break;
+    }
+    var indextemp;
+    var filenametemp=req.session.img;
+    for(i=filenametemp.length-1;i>=0;i--)
+    if(filenametemp[i]=='.')
+    {
+        indextemp=i;
+        break;
+    }
+    file.name=req.session.img.slice(0,indextemp)+file.name.slice(index);
+    fs.unlink('./public/upload/'+req.session.img, (err) => {
+        if (err) throw err;
+        console.log('successfully deleted image');
+      });
+      req.session.img=file.name;
+    file.mv("./public/upload/"+file.name,function(err){
+        if(err)
+        res.send("Error");
+        else
+        res.render('settings',{img:file.name});
+    });
+    const directory = './downloads/';
+    fs.readdir(directory, (err, files) => {
+    if (err) throw err;
+
+    for (const f of files) {
+        fs.unlink(path.join(directory, f), err => {
+        if (err) throw err;
+        });
+    }
+    });
     users.updateOne({_id:req.session.uid}, { $set: { image: req.session.img } },function(err,user){
         console.log(user);
     });
