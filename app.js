@@ -156,10 +156,16 @@ app.post('/save-user', (req, res) => {
 
 
 app.post("/loginP", (req, res) => {
+    if(req.session.uid)
+    res.redirect("/");
+    else
     res.sendFile(__dirname + "/signin.html");
 });
 
 app.get("/loginP", (req, res) => {
+    if(req.session.uid)
+    res.redirect("/");
+    else
     res.sendFile(__dirname + "/signin.html");
 });
 
