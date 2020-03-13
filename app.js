@@ -205,6 +205,8 @@ app.get("/searchanime",function(req,res){
 });
 
 app.post("/add",async function(req,res){
+    if(!req.session.uid)
+    return res.redirect("/loginP");
     await users.findOne({_id:req.session.uid},async function(err,data){
         if(!err){
             var flag=0;
@@ -230,6 +232,8 @@ app.post("/add",async function(req,res){
 });
 
 app.get("/showlist",function(req,res){
+    if(!req.session.uid)
+    return res.redirect("/loginP");
     users.findOne({_id:req.session.uid},function(err,data){
         res.render("list",{lists:data.list});
     });
