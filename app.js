@@ -64,43 +64,6 @@ app.post('/download',function(req,res){
 });
 
 
-/*app.post('/test',function(req,res){
-    console.log(req.files);
-    if(req.files)
-    {
-        var file=req.files.myfile;
-        var index;
-        var filename=file.name;
-        for(i=filename.length-1;i>=0;i--)
-        if(filename[i]=='.')
-        {
-            index=i;
-            break;
-        }
-        var indextemp;
-        var filenametemp=req.session.img;
-        for(i=filenametemp.length-1;i>=0;i--)
-        if(filenametemp[i]=='.')
-        {
-            indextemp=i;
-            break;
-        }
-        file.name=req.session.img.slice(0,indextemp)+filename.slice(index);
-        filename=file.name;
-        fs.unlink('./public/upload/'+req.session.img, (err) => {
-            if (err) throw err;
-            console.log('successfully deleted image');
-          });
-          req.session.img=filename;
-        file.mv("./public/download/"+file.name,function(err){
-            if(err)
-            res.send("Error");
-            else
-            res.render('settings',{img:filename});
-        });
-    }
-});*/
-
 /*-------------------save profile----------------------*/
 
 app.post('/saveprofile',function(req,res){
