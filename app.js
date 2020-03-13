@@ -19,7 +19,7 @@ mongoose.connect("mongodb+srv://terminator:testdb@accounts-0uu7d.mongodb.net/Use
     useUnifiedTopology: true
 });
 app.use(session({
-    secret: "Shh, its a secret!",
+    secret: "Shh, its a secret!"
 }));
 app.set('view engine', 'ejs');
 app.use(express.static('public/index'));
@@ -155,7 +155,8 @@ const loginUsers = new mongoose.Schema({
     email: String,
     password: String,
     fullName:String,
-    image:String
+    image:String,
+    list:Array,
 });
 const users = mongoose.model("user", loginUsers);
 
@@ -193,6 +194,44 @@ app.post('/searchuser',(req,res)=>{
     users.find({fullName: new RegExp(req.body.temp, "i")},function(err,user){
             console.log(user);
             res.send(user);
+    });
+});
+
+
+/*------------------Search Anime--------------------*/
+
+app.get("/searchanime",function(req,res){
+    res.sendFile(__dirname+"/search.html");
+});
+
+app.post("/add",async function(req,res){
+    await users.findOne({_id:req.session.uid},async function(err,data){
+        if(!err){
+            var flag=0;
+            for(i in data.list){
+                console.log(data.list[i].id);
+                if(req.body.id==data.list[i].id)
+                {
+                    flag=1;
+                    break;
+                }
+            }
+            if (flag){
+                //http://api.jikan.moe/v3/anime/1535
+            }
+            else{
+                await users.updateOne({_id:req.session.uid}, { $push: {list: {id:req.body.id,image_url:req.body.img,title:req.body.title}}});
+            }
+        } else {
+            res.send(err);
+        }
+    })
+    res.send("Correct");
+});
+
+app.get("/showlist",function(req,res){
+    users.findOne({_id:req.session.uid},function(err,data){
+        res.render("list",{lists:data.list});
     });
 });
 
