@@ -220,6 +220,16 @@ app.get("/showlist",function(req,res){
     });
 });
 
+app.get("/getlist",function(req,res){
+    if(!req.session.uid)
+    return res.redirect("/loginP");
+    users.findOne({_id:req.session.uid},function(err,data){
+        res.send({listx:data.list});
+    });
+});
+
+
+
 /*-------------------------search list----------------------------*/
 app.post("/searchlist",function(req,res){
     users.findOne({_id:req.session.uid},function(err,data){
