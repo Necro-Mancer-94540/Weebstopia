@@ -164,44 +164,71 @@ app.post('/searchuser',(req,res)=>{
 /*------------------Search Anime--------------------*/
 
 app.get("/searchanime",function(req,res){
-    res.sendFile(__dirname+"/search.html");
+    res.render("searchanim");
 });
 
-app.post("/add",async function(req,res){
+app.post("/add",function(req,res){
     if(!req.session.uid)
     return res.redirect("/loginP");
-    await users.findOne({_id:req.session.uid},async function(err,data){
+    users.findOne({_id:req.session.uid},async function(err,data){
         if(!err){
-            var flag=0;
+            var flag=0,index_i,index_j;
             for(i in data.list){
-                console.log(data.list[i].id);
-                if(req.body.id==data.list[i].id)
+                if(req.body.listvalue==data.list[i].listname)
                 {
-                    flag=1;
+                    index_i=i;
+                    console.log(index_i);
+                    console.log("aa gaya");
+                    for(j in data.list[i].lists){
+                        if(req.body.id==data.list[i].lists[j].id)
+                        {
+                            index_j=j;
+                            flag=1;
+                            //console.log("index_i,index_j");
+                            break;
+                        }
+                    }
                     break;
                 }
+                
             }
+            console.log(flag);
             if (flag){
                 //http://api.jikan.moe/v3/anime/1535
             }
             else{
-                await users.updateOne({_id:req.session.uid}, { $push: {list: {id:req.body.id,image_url:req.body.img,title:req.body.title}}});
+                data.list[index_i].lists.push({id:req.body.id,image_url:req.body.img,title:req.body.title});
+                //console.log(data.list[index_i].lists);
+                
+                await users.updateOne({_id:req.session.uid}, data);
+                /*await users.findOne({_id:req.session.uid},function(err,d){
+                    console.log(data.list[0].lists);
+                });*/
             }
         } else {
             res.send(err);
         }
+        res.send("correct")
     })
-    res.send("Correct");
 });
 
 app.get("/showlist",function(req,res){
     if(!req.session.uid)
     return res.redirect("/loginP");
     users.findOne({_id:req.session.uid},function(err,data){
-        res.render("list",{lists:data.list});
+        res.render("list",{listx:data.list});
     });
 });
 
+/*-------------------------search list----------------------------*/
+app.post("/searchlist",function(req,res){
+    users.findOne({_id:req.session.uid},function(err,data){
+        console.log(data.list,data.list.length,data.list[0].listname);
+        // res.send("found");
+        res.send({a:data.list});
+        // res.send({a})
+    });
+});
 
 /*---------------------sign up---------------------*/
 

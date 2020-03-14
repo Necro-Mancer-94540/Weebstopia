@@ -2,8 +2,25 @@ $("#loader").hide(0);
 $("#next-button").hide(0);
 $("#previous-button").hide(0);
 function add(id,image,title){
+  $("#opt").html("");
   console.log(id,image);
-  $.post('/add',{id:id,img:image,title:title});
+  $.post('/searchlist',function(data,result){
+    $("#exampleModalCenter").modal("show");
+    console.log(data.a[0].listname);
+    var k=0;
+    $("#opt").append("<option value='0'>Select</option>");
+    for(i in data.a){
+      console.log(i);
+      $("#opt").append("<option>"+data.a[i].listname+"</option>");
+    }
+});
+$("#save").click(function(){
+  console.log($("#opt").val());
+  $.post('/add',{id:id,img:image,title:title,listvalue:$("#opt").val()},function(data,res){
+    if(data)
+    $('#exampleModalCenter').modal('hide')
+  });
+});
 }
 $(document).ready(function () {
 
