@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Weebstopia</title>
   <link rel="icon" href="favicon.ico">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="index.css">
   <link href="https://fonts.googleapis.com/css?family=Montserrat:700|Nunito|Raleway|Ubuntu:500" rel="stylesheet">
 
   <!-- CDN -->
@@ -39,15 +39,13 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <form class="form-inline" style="position: absolute;right:0px;" action="/search" method="POST">
-            <button class="btn btn-outline-primary mr-sm-2" type="submit">Search User</button>
-          </form>
-          <!--<form class="form-inline" style="position: absolute;right:90px;" action="/loginP" method="POST">
+
+          <form class="form-inline" style="position: absolute;right:90px;" action="/log-in" method="GET">
             <button class="btn btn-outline-primary mr-sm-2" type="submit">Login</button>
           </form>
-          <form class="form-inline" style="position: absolute;right:0px;" action="/sign-up" method="POST">
+          <form class="form-inline" style="position: absolute;right:0px;" action="/sign-up" method="GET">
             <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Signup</button>
-          </form>-->
+          </form>
         </div>
       </nav>
     </div>
@@ -61,12 +59,8 @@
           <h5 class="d-flex justify-content-center mt-md-5 mt-3 text-center" id="description-text">A social media site
             for weebs.</h5>
           <div class="d-flex justify-content-center mt-md-5 mt-4">
-            <form class="form-inline" style="position: relative;left:-15px;" action="/loginP" method="POST">
-              <button class="btn btn-outline-primary mr-sm-2" type="submit">Login</button>
-            </form>
-            <form class="form-inline" style="position: relative;left:15px;" action="/sign-up" method="POST">
-              <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Signup</button>
-            </form>
+            <button type="button" class="btn btn-secondary mr-3">#</button>
+            <button type="button" class="btn btn-secondary ml-3">#</button>
           </div>
         </div>
         <div class="col-md-6 d-flex justify-content-center pt-4">

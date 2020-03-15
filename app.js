@@ -1,324 +1,464 @@
+// -------------------------------------------------- start -------------------------------------------------- //
 
-/*------------------------Require modules------------------------*/
 
 const express = require('express');
-const ejs = require("ejs");
+const ejs = require('ejs');
 const session = require('express-session');
 const bodyParser = require('body-parser');
-const mongoose = require("mongoose");
-var crypto = require('crypto');
-const fs=require('fs');
-const upload=require('express-fileupload');
-const path = require('path');
+const mongoose = require('mongoose');
+const crypto = require('crypto');
+const MongoStore = require('connect-mongo')(session);
+const upload = require('express-fileupload');
+const fs = require('fs').promises;
+const dotenv = require('dotenv');
 
-/*------------------------Initialize Modules-------------------------*/
+
+// -------------------------------------------------- server settings -------------------------------------------------- //
+
 
 const app = express();
-mongoose.connect("mongodb+srv://terminator:testdb@accounts-0uu7d.mongodb.net/Users", {
+dotenv.config();
+mongoose.connect(process.env.CONN, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
 app.use(session({
-    secret: "Shh, its a secret!"
+    secret: "I'll Take A Potato Chip... And Eat It!",
+    resave: false,
+    saveUninitialized: true,
+    store: new MongoStore({
+        mongooseConnection: mongoose.connection,
+        touchAfter: 3600
+    })
 }));
 app.set('view engine', 'ejs');
+app.use(express.static('public'));
 app.use(express.static('public/index'));
+app.use(express.static('public/log-in'));
+app.use(express.static('public/profile'));
+app.use(express.static('public/search'));
+app.use(express.static('public/settings'));
+app.use(express.static('public/sign-up'));
 app.use(express.static('public/upload'));
-app.use(express.static('downloads'));
-
+app.use(express.static('public/view-profile'));
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-app.use(upload());
-
-/*--------------------settings-----------------*/
-
-app.get('/settings',function(req,res){
-    if(req.session.uid)
-    {
-        console.log(req.session);
-        res.render("settings",{img:req.session.img});
-    }
-    else{
-        res.redirect("/loginP");
-    }
-});
-var file;
-var flag=0;
-app.post('/download',function(req,res){
-    if(req.files)
-    {
-        console.log(req.files);
-        file=req.files.myfile;
-        file.name="d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa"+file.name;
-        file.mv("./downloads/"+file.name,function(err){
-            if(err)
-            res.send("Error");
-            else
-            res.render('settings',{img:file.name});
-        });
-    }
-    else{
-        file=req.files;
-    }
-});
-
-
-/*-------------------save profile----------------------*/
-
-app.post('/saveprofile',function(req,res){
-    if(!file)
-    return setTimeout(function(){ res.redirect("/"); }, 3000);
-    var index;
-    for(i=file.name.length-1;i>=0;i--)
-    if(file.name[i]=='.')
-    {
-        index=i;
-        break;
-    }
-    var indextemp;
-    var filenametemp=req.session.img;
-    for(i=filenametemp.length-1;i>=0;i--)
-    if(filenametemp[i]=='.')
-    {
-        indextemp=i;
-        break;
-    }
-    file.name=req.session.img.slice(0,indextemp)+file.name.slice(index);
-    fs.unlink('./public/upload/'+req.session.img, (err) => {
-        if (err) throw err;
-        console.log('successfully deleted image');
-      });
-      req.session.img=file.name;
-    file.mv("./public/upload/"+file.name,function(err){
-        if(err)
-        res.send("Error");
-        else
-        res.render('settings',{img:file.name});
-    });
-    const directory = './downloads/';
-    fs.readdir(directory, (err, files) => {
-    if (err) throw err;
-
-    for (const f of files) {
-        fs.unlink(path.join(directory, f), err => {
-        if (err) throw err;
-        });
-    }
-    });
-    users.updateOne({_id:req.session.uid}, { $set: { image: req.session.img } },function(err,user){
-        console.log(user);
-    });
-    res.redirect("/");
-});
-
-/*--------------Create schema for mongodb---------------------*/
-
-const loginUsers = new mongoose.Schema({
+const userDetail = new mongoose.Schema({
+    fullName: String,
+    userName: String,
     email: String,
     password: String,
-    fullName:String,
-    image:String,
-    list:Array,
+    profilePic: String,
+    list:Array
 });
-const users = mongoose.model("user", loginUsers);
+const detail = mongoose.model('user', userDetail);
+app.use(upload());
 
 
-/*------------register user--------------------*/
+// -------------------------------------------------- root route -------------------------------------------------- //
 
 
-function saveUser(data, res) {
-    users.findOne({
-        email: data.email
-    }, function (err, user) {
-        if (!user) {
-            const newUser = new users({
-                fullName: data.fullName,
-                email: data.email,
-                password: crypto.createHash('sha256').update(data.password).digest('hex').toString()
+app.get('/',(req, res) => {
+    if (!req.session.uid) {
+        res.render('index');
+    } else {
+        detail.findById(req.session.uid, (err, user) => {
+            res.render('profile', {
+                details: user
             });
-            newUser.save();
-        } else {
-            return res.redirect("/sign-up");
-        }
-    });
-
-}
-
-/*--------------search user-------------------*/
-
-
-app.post('/search', (req, res) => {
-    res.render('search');
+        });
+    }
 });
-
-app.post('/searchuser',(req,res)=>{
-    console.log(req.body.temp);
-    users.find({fullName: new RegExp(req.body.temp, "i")},function(err,user){
-            console.log(user);
-            res.send(user);
-    });
-});
-
 
 /*------------------Search Anime--------------------*/
 
 app.get("/searchanime",function(req,res){
-    res.sendFile(__dirname+"/search.html");
+    res.render("searchanim");
 });
 
-app.post("/add",async function(req,res){
+app.post("/add",function(req,res){
     if(!req.session.uid)
     return res.redirect("/loginP");
-    await users.findOne({_id:req.session.uid},async function(err,data){
+    detail.findOne({_id:req.session.uid},async function(err,data){
         if(!err){
-            var flag=0;
+            var flag=0,index_i,index_j;
             for(i in data.list){
-                console.log(data.list[i].id);
-                if(req.body.id==data.list[i].id)
+                if(req.body.listvalue==data.list[i].listname)
                 {
-                    flag=1;
+                    index_i=i;
+                    console.log(index_i);
+                    console.log("aa gaya");
+                    for(j in data.list[i].lists){
+                        if(req.body.id==data.list[i].lists[j].id)
+                        {
+                            index_j=j;
+                            flag=1;
+                            //console.log("index_i,index_j");
+                            break;
+                        }
+                    }
                     break;
                 }
+                
             }
+            console.log(flag);
             if (flag){
                 //http://api.jikan.moe/v3/anime/1535
             }
             else{
-                await users.updateOne({_id:req.session.uid}, { $push: {list: {id:req.body.id,image_url:req.body.img,title:req.body.title}}});
+                data.list[index_i].lists.push({id:req.body.id,image_url:req.body.img,title:req.body.title});
+                //console.log(data.list[index_i].lists);
+                
+                await detail.updateOne({_id:req.session.uid}, data);
+                /*await detail.findOne({_id:req.session.uid},function(err,d){
+                    console.log(data.list[0].lists);
+                });*/
             }
         } else {
             res.send(err);
         }
+        res.send("correct")
     })
-    res.send("Correct");
 });
 
 app.get("/showlist",function(req,res){
-    if(!req.session.uid)
-    return res.redirect("/loginP");
-    users.findOne({_id:req.session.uid},function(err,data){
-        res.render("list",{lists:data.list});
+    detail.findOne({_id:req.session.uid},function(err,data){
+        res.render("list",{listx:data.list});
+    });
+});
+
+app.get("/getlist",function(req,res){
+    detail.findOne({_id:req.session.uid},function(err,data){
+        res.send({listx:data.list});
+    });
+});
+
+/*-------------------------delete list-----------------------------*/
+
+app.get("/deletelist",function(req,res){
+    res.render("deleteList");
+});
+
+app.post("/del",async function(req,res){
+    console.log(req.body);
+    for(i in req.body){
+        await detail.update(
+            {_id:req.session.uid},
+            { $pull: { list:{listname:i}} }
+        );
+    }
+    res.send("Get");
+});
+
+
+/*-------------------------Edit list-------------------------------*/
+
+app.get("/editlist",function(req,res){
+    detail.findOne({_id:req.session.uid},function(err,data){
+        res.render("editlist",{listx:data.list});
+    });
+});
+
+app.post("/deleteListItems",function(req,res){
+    console.log(req.body);
+    detail.findOne({_id:req.session.uid}, 'list', async function(err,data){
+        // delete in which? ind = 3
+        for(i in data.list){
+            for(j in data.list[i].lists){
+                if((data.list[i].listname+data.list[i].lists[j].title) in req.body)
+                {
+                    console.log("deleted");
+                    data.list[i].lists.splice(j,1);
+                    // delete [j];
+                    console.log(j,data.list[i].lists);
+                }
+            }
+        }
+        await detail.updateOne({_id:req.session.uid}, data);
+    });
+    res.send("Done");
+});
+
+
+/*------------------------create list------------------------------*/
+
+app.post("/create-list",function(req,res){
+    console.log(req.body);
+    detail.findOne({_id:req.session.uid},async function(err,data){
+        var flag=0;
+        for(i in data.list){
+            if(data.list[i].listname==req.body.listID)
+            {
+                flag=1;
+                break;
+            }
+        }
+        if(!flag){
+            await detail.updateOne({_id:req.session.uid},{$push:{list:{listname:req.body.listID,lists:[]}}});
+            await detail.findOne({_id:req.session.uid},function(err,d){
+                console.log(d.list);
+                res.send("Test");
+            });
+        }
     });
 });
 
 
-/*---------------------sign up---------------------*/
 
-app.post('/sign-up', (req, res) => {
-    res.render('sign-up');
+/*-------------------------search list----------------------------*/
+app.post("/searchlist",function(req,res){
+    detail.findOne({_id:req.session.uid},function(err,data){
+        console.log(data.list,data.list.length,data.list[0].listname);
+        // res.send("found");
+        res.send({a:data.list});
+        // res.send({a})
+    });
+});
+
+
+// -------------------------------------------------- sign-up routes -------------------------------------------------- //
+
+
+app.get('/sign-up', (req, res) => {
+    if (!req.session.uid) {
+        res.render('sign-up', {
+            message: '',
+            bg: 'bg-white',
+            text: 'text-secondary'
+        });
+    } else {
+        res.redirect('/');
+    }
 });
 
 app.post('/save-user', (req, res) => {
-    saveUser(req.body, res);
-    res.redirect("/loginP");
+    detail.findOne({
+        userName: req.body.userName
+    }, (err, found) => {
+        if (found) {
+            res.render('sign-up', {
+                message: 'User name already exists!',
+                bg: 'bg-danger',
+                text: 'text-white'
+            });
+        } else {
+            detail.findOne({
+                email: req.body.email
+            }, (err, user) => {
+                if (!user) {
+                    const newUser = new detail({
+                        fullName: req.body.fullName,
+                        userName: req.body.userName,
+                        email: req.body.email,
+                        password: crypto.createHash('sha256').update(req.body.password).digest('hex').toString(),
+                        profilePic: 'profile-pic-default.png'
+                    });
+                    newUser.save();
+                    req.session.uid = newUser._id;
+                    req.session.uun = newUser.userName;
+                    req.session.upp = newUser.profilePic;
+                    if (req.body.remember == 'true') {
+                        req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
+                    }
+                    req.session.save(() => {
+                        res.redirect('/');
+                    });
+                } else {
+                    res.render('log-in', {
+                        message: 'You already have an account!',
+                        bg: 'bg-warning',
+                        text: 'text-white'
+                    });
+                }
+            });
+        }
+    });
 });
 
-/*------------------Login---------------------*/
+
+// -------------------------------------------------- log-in routes -------------------------------------------------- //
 
 
-app.post("/loginP", (req, res) => {
-    if(req.session.uid)
-    res.redirect("/");
-    else
-    res.sendFile(__dirname + "/signin.html");
+app.get('/log-in', (req, res) => {
+    if (!req.session.uid) {
+        res.render('log-in', {
+            message: '',
+            bg: 'bg-white',
+            text: 'text-secondary'
+        });
+    } else {
+        res.redirect('/');
+    }
 });
 
-app.get("/loginP", (req, res) => {
-    if(req.session.uid)
-    res.redirect("/");
-    else
-    res.sendFile(__dirname + "/signin.html");
-});
-
-app.get('/', (req, res) => {
-    if(req.session.uid)
-    res.render('logout');
-    else
-    res.render('index');
-});
-
-app.get('/log', (req, res) => {
-    console.log("gLog reqest", req.session);
-    if (!req.session.uid)
-        return res.redirect("/loginP")
-    res.redirect('/');
-});
-app.post('/login', (req, res) => {
-    const e = req.body.email;
-    const p = req.body.pname;
-    var hvalue = crypto.createHash('sha256').update(p).digest('hex').toString();
-    console.log(req.body, e, hvalue);
-    if (e && p) {
-        users.findOne({
-            email: e
-        }, function (err, user) {
-            var k = 0,
-                j = 0;
-            console.log(user);
-            if (!user) {
-                res.send({
-                    "email": -1,
-                    "successfull": false
-                });
-            } else if (user.email === e && user.password === hvalue) {
-
-                req.session.uid = user.id;
-                req.session.img=user.image;
-                req.session.fullName=user.fullName;
-                console.log("setting cookie", req.session, user);
-                res.send({
-                    "successfull": true
-                });
-
-            } else {
-                if ((user.email !== e))
-                    k = 1;
-                if ((user.password !== p))
-                    j = 1;
-                res.send({
-                    "email": k,
-                    "password": j,
-                    "successfull": false
-                });
+app.post('/check-user', (req, res) => {
+    const password = crypto.createHash('sha256').update(req.body.password).digest('hex').toString();
+    detail.findOne({
+        userName: req.body.userName
+    }, (err, user) => {
+        if (user && user.password == password) {
+            req.session.uid = user._id;
+            req.session.uun = user.userName;
+            req.session.upp = user.profilePic;
+            if (req.body.remember == 'true') {
+                req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
             }
+            req.session.save(() => {
+                res.redirect('/');
+            });
+        } else {
+            res.render('log-in', {
+                message: 'Incorrect user name or password!',
+                bg: 'danger'
+            });
+        }
+    });
+});
+
+app.get('/log-out', (req, res) => {
+    req.session.destroy(() => {
+        res.redirect('/');
+    });
+});
+
+
+// -------------------------------------------------- settings routes -------------------------------------------------- //
+
+
+app.get('/settings', (req, res) => {
+    if (!req.session.uid) {
+        res.redirect('/');
+    } else {
+        detail.findById(req.session.uid, (err, user) => {
+            res.render('settings', {
+                message: ['Account Settings'],
+                bg: ["primary"],
+                details: user
+            });
         });
     }
 });
 
-app.post("/logOut", (req, res) => {
-    req.session.destroy();
-    res.redirect("/");
+app.post('/save-settings', async (req, res) => {
+    var message = [],
+        bg = []
+    const user = await detail.findById(req.session.uid);
+    if (!(req.body.newp1 == '' && req.body.newp2 == '')) {
+        if (crypto.createHash('sha256').update(req.body.oldp).digest('hex').toString() != user.password) {
+            message.push('Incorrect Password!');
+            bg.push('danger');
+        } else if (req.body.newp1 != req.body.newp2) {
+            message.push('Passwords do not match!');
+            bg.push('danger');
+        } else {
+            message.push('Password updated successfully!');
+            bg.push('success');
+            user.password = crypto.createHash('sha256').update(req.body.newp1).digest('hex').toString();
+        }
+    }
+    if (req.body.email != user.email) {
+        const found = await detail.findOne({
+            email: req.body.email
+        });
+        if (found) {
+            message.push('Account with that e-mail already exists!');
+            bg.push('danger');
+        } else {
+            message.push('E-mail updated successfully!');
+            bg.push('success');
+            user.email = req.body.email;
+        }
+    }
+    if (req.body.userName != user.userName) {
+        const found = await detail.findOne({
+            userName: req.body.userName
+        });
+        if (found) {
+            message.push('Account with that user name already exists!');
+            bg.push('danger');
+        } else {
+            message.push('User name updated successfully!');
+            bg.push('success');
+            user.userName = req.body.userName;
+        }
+    }
+    if (req.files) {
+        const pic = req.files.profilePic;
+        if (req.session.upp != 'profile-pic-default.png') {
+            fs.unlink(__dirname + '/public/upload/' + req.session.upp);
+        }
+        pic.name = 'profile-pic-' + req.session.uun + '-' + pic.name;
+        await pic.mv(__dirname + '/public/upload/' + pic.name);
+        message.push('Profile picture updated successfully!');
+        bg.push('success');
+        user.profilePic = pic.name;
+    }
+    await detail.updateOne({
+        _id: user._id
+    }, user);
+    req.session.upp = user.profilePic;
+    req.session.uun = user.userName;
+    req.session.save(() => {
+        detail.findById(req.session.uid, (err, user) => {
+            res.render('settings', {
+                message: message,
+                bg: bg,
+                details: user
+            });
+        });
+    });
 });
 
-/*-------------------show profile-----------------------*/
+app.post('/delete-account', async (req, res) => {
+    if (req.session.upp != 'profile-pic-default.png') {
+        fs.unlink(__dirname + '/public/upload/' + req.session.upp);
+    }
+    await detail.findByIdAndDelete(req.session.uid);
+    res.redirect('/log-out');
+});
+
+
+// -------------------------------------------------- search routes -------------------------------------------------- //
+
+
+app.get('/search-user', (req, res) => {
+    res.render('search');
+});
 
 app.post('/showprofile',(req,res)=>{
     console.log(req.body);
-    users.findOne({_id: req.body["hello"]},function(err,user){
-        res.redirect("/"+user.fullName)
+    detail.findOne({_id: req.body["hello"]},function(err,user){
+        res.redirect("/users/"+user.userName)
         console.log(user);
 });
 });
 
-app.get("/:customListName",function(req,res){
-    users.findOne({fullName:req.params.customListName},function(err,results){
-        if(!err){
-            if(!results){
-                res.redirect("/");
-            } else {
-                res.render("profile", {
-                    name: results.fullName,
-                    image: results.image
-                });
-            }
-        }
+app.post('/search-user', (req, res) => {
+    detail.find({
+        userName: new RegExp(req.body.temp, 'i')
+    }, (err, user) => {
+        res.send(user);
     });
-    console.log(req.params.customListName);
 });
 
-/*----------starting server-----------------*/
+app.get('/users/:userName', (req, res) => {
+    detail.findOne({
+        userName: req.params.userName
+    }, (err, user) => {
+        res.render('view-profile', {
+            details: user
+        });
+    });
+});
+
+
+// -------------------------------------------------- listen -------------------------------------------------- //
+
 
 app.listen(3000, () => {
-    console.log("Server started!");
+    console.log('Server started!');
 });
+
+
+// -------------------------------------------------- end -------------------------------------------------- //
