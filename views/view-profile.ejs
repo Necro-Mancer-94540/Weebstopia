@@ -8,12 +8,7 @@
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <title><%= details.fullName %>'s Profile</title>
     <!------ Include the above in your HEAD tag ---------->
-    <link rel="stylesheet" href="profile.css">
-    <style>
-        .clearfix {
-            overflow: hidden;
-        }
-    </style>
+    <link rel="stylesheet" href="../profile.css">
 </head>
 
 <body>
@@ -33,12 +28,36 @@
     </nav>
 
     <div class="jumbotron jumbotron-fluid">
-        <div class="container clearfix">
-            <img src="../<%= details.profilePic %>" width="200" height="200" style="border-radius: 50%;float:left;">
-            <div style="position: relative;left:50px;">
+        <div class="row">
+            <div class="col-2" style="margin-left: 70px;"><img src="../<%= details.profilePic %>" width="200" height="200" style="border-radius: 50%;"></div>
+            <div class="col-4">
                 <h1><%= details.userName %></h1>
                 <h3>Email : <%= details.email %></h3>
                 <h5>FullName : <%= details.fullName %></h5>
+            </div>
+            <div class="col-4" style="margin-left:10%;">
+                <span style="position: absolute;right:0px">
+                    <form action="/show/<%= details._id %>" method="POST">
+                        <button type="submit" class="btn btn-primary" style="display: block;border-bottom-right-radius: 0;border-bottom-left-radius: 0;width:100%;">
+                            Followers <span class="badge badge-light"><%= details.followers.length %></span>
+                        </button>
+                    </form>
+                    <% if(exists){ %>
+                        <form action="/show/<%= details._id %>" method="POST">
+                            <button type="submit" class="btn btn-primary" style="border-top-right-radius: 0;border-top-left-radius: 0;width:100%;">
+                                Following <span class="badge badge-light"><%= details.following.length %></span>
+                            </button>
+                        </form>
+                    <% } %>
+                    <% if(!exists){ %>
+                        <form action="/show/<%= details._id %>" method="POST">
+                            <button type="submit" class="btn btn-primary" style="border-radius:0;width:100%;">
+                                Following <span class="badge badge-light"><%= details.following.length %></span>
+                            </button>
+                        </form>
+                        <button class="btn btn-outline-secondary" id="follow" style="border-top-right-radius: 0;border-top-left-radius: 0;width:100%;"></button>
+                    <% } %>
+                </span>
             </div>
         </div>
     </div>
@@ -52,6 +71,27 @@
     </script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+    </script>
+    <script>
+        $(document).ready(function () {
+            var followVar = "<%= follows %>";      
+            var followerCountVar = <%= details.followers.length %>;
+            var followingCountVar = <%= details.following.length %>;
+            editor(followVar, followerCountVar, followingCountVar);            
+            $("#follow").on("click", function () {
+                $("#follow").prop("disabled", true);
+                $.post('/follow-user', {userName: "<%=details.userName%>", id: "<%=details._id%>", follows: followVar}, (data)=>{
+                    followVar = data;                    
+                    editor(followVar, (followVar == "-1") ? --followerCountVar : ++followerCountVar, followingCountVar);
+                    $("#follow").prop("disabled", false);
+                });
+            });
+        });
+        function editor(followVar, followerCountVar, followingCountVar){
+            $('#follow').html((followVar == "-1") ? 'Follow' : 'Unfollow');
+            $('#follower-count').html(followerCountVar);
+            $('#following-count').html(followingCountVar);
+        }
     </script>
 </body>
 

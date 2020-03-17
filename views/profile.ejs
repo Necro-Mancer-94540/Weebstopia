@@ -9,11 +9,6 @@
     <title><%= details.fullName %>'s Profile</title>
     <!------ Include the above in your HEAD tag ---------->
     <link rel="stylesheet" href="profile.css">
-    <style>
-        .clearfix {
-            overflow: hidden;
-        }
-    </style>
     <title>Document</title>
 </head>
 
@@ -36,14 +31,27 @@
             </ul>
         </div>
     </nav>
-
     <div class="jumbotron jumbotron-fluid">
-        <div class="container clearfix">
-            <img src="<%= details.profilePic %>" width="200" height="200" style="border-radius: 50%;float:left;">
-            <div style="position: relative;left:50px;">
+        <div class="row">
+            <div class="col-2" style="margin-left: 70px;"><img src="<%= details.profilePic %>" width="200" height="200" style="border-radius: 50%;"></div>
+            <div class="col-4">
                 <h1><%= details.userName %></h1>
                 <h3>Email : <%= details.email %></h3>
                 <h5>FullName : <%= details.fullName %></h5>
+            </div>
+            <div class="col-4" style="margin-left:10%;">
+                <span style="position: absolute;right:0px">
+                    <form action="/showfollowers" method="POST">
+                    <button type="submit" class="btn btn-primary" style="display: block;border-bottom-right-radius: 0;border-bottom-left-radius: 0;width:100%;">
+                        Followers <span class="badge badge-light"><%= details.followers.length %></span>
+                    </button>
+                    </form>
+                    <form action="/showfollowing" method="POST">
+                    <button type="submit" class="btn btn-primary" style="border-top-right-radius: 0;border-top-left-radius: 0;width:100%;">
+                        Following <span class="badge badge-light"><%= details.following.length %></span>
+                    </button>
+                    </form>
+                </span>
             </div>
         </div>
     </div>
