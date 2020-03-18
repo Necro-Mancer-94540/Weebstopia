@@ -39,20 +39,20 @@
                 <span style="position: absolute;right:0px">
                     <form action="/show/<%= details._id %>" method="POST">
                         <button type="submit" class="btn btn-primary" style="display: block;border-bottom-right-radius: 0;border-bottom-left-radius: 0;width:100%;">
-                            Followers <span class="badge badge-light"><%= details.followers.length %></span>
+                            Followers <span id="follower-count" class="badge badge-light"><%= details.followers.length %></span>
                         </button>
                     </form>
                     <% if(exists){ %>
                         <form action="/show/<%= details._id %>" method="POST">
                             <button type="submit" class="btn btn-primary" style="border-top-right-radius: 0;border-top-left-radius: 0;width:100%;">
-                                Following <span class="badge badge-light"><%= details.following.length %></span>
+                                Following <span id="following-count" class="badge badge-light"><%= details.following.length %></span>
                             </button>
                         </form>
                     <% } %>
                     <% if(!exists){ %>
                         <form action="/show/<%= details._id %>" method="POST">
                             <button type="submit" class="btn btn-primary" style="border-radius:0;width:100%;">
-                                Following <span class="badge badge-light"><%= details.following.length %></span>
+                                Following <span id="following-count" class="badge badge-light"><%= details.following.length %></span>
                             </button>
                         </form>
                         <button class="btn btn-outline-secondary" id="follow" style="border-top-right-radius: 0;border-top-left-radius: 0;width:100%;"></button>
@@ -79,11 +79,12 @@
             var followingCountVar = <%= details.following.length %>;
             editor(followVar, followerCountVar, followingCountVar);            
             $("#follow").on("click", function () {
-                $("#follow").prop("disabled", true);
+                //$("#follow").prop("disabled", true);
                 $.post('/follow-user', {userName: "<%=details.userName%>", id: "<%=details._id%>", follows: followVar}, (data)=>{
+                    console.log(data);
                     followVar = data;                    
                     editor(followVar, (followVar == "-1") ? --followerCountVar : ++followerCountVar, followingCountVar);
-                    $("#follow").prop("disabled", false);
+                    //$("#follow").prop("disabled", false);
                 });
             });
         });
