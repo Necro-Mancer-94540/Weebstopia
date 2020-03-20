@@ -26,17 +26,40 @@
     #default-search {
       min-height: 75vh;
     }
-    .makebuttonlink{
-      background: none!important;
+
+    .makebuttonlink {
+      background: none !important;
       border: none;
-      padding: 0!important;
+      padding: 0 !important;
       /*optional*/
       font-family: arial, sans-serif;
       /*input has OS specific font-family*/
       color: #069;
       text-decoration: none;
       cursor: pointer;
-  }
+    }
+
+    ::placeholder {
+      color: white;
+      opacity: 1;
+      /* Firefox */
+    }
+
+    :-ms-input-placeholder {
+      /* Internet Explorer 10-11 */
+      color: white;
+    }
+
+    ::-ms-input-placeholder {
+      /* Microsoft Edge */
+      color: white;
+    }
+    input[type="text"]{
+      color:white;
+    }
+    .polaroid {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        }
   </style>
 
 </head>
@@ -44,7 +67,7 @@
 <body>
 
   <div class="container-fluid p-5 bg-dark input-group">
-    <input type="text" id="search-box" placeholder="Search..."
+    <input type="text" id="search-box" placeholder="Search User"
       class="border border-dark rounded-left border-0 bg-secondary pl-2" autofocus>
     <button class="border border-dark rounded-right border-0 bg-secondary" id="search-button"><img src="search.png"
         alt="Search" height="35" width="35" /></button>

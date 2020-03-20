@@ -37,20 +37,20 @@
             </div>
             <div class="col-4" style="margin-left:10%;">
                 <span style="position: absolute;right:0px">
-                    <form action="/show/<%= details._id %>" method="POST">
+                    <form action="/showfollowers/<%= details._id %>" method="POST">
                         <button type="submit" class="btn btn-primary" style="display: block;border-bottom-right-radius: 0;border-bottom-left-radius: 0;width:100%;">
                             Followers <span id="follower-count" class="badge badge-light"><%= details.followers.length %></span>
                         </button>
                     </form>
                     <% if(exists){ %>
-                        <form action="/show/<%= details._id %>" method="POST">
+                        <form action="/showfollowing/<%= details._id %>" method="POST">
                             <button type="submit" class="btn btn-primary" style="border-top-right-radius: 0;border-top-left-radius: 0;width:100%;">
                                 Following <span id="following-count" class="badge badge-light"><%= details.following.length %></span>
                             </button>
                         </form>
                     <% } %>
                     <% if(!exists){ %>
-                        <form action="/show/<%= details._id %>" method="POST">
+                        <form action="/showfollowing/<%= details._id %>" method="POST">
                             <button type="submit" class="btn btn-primary" style="border-radius:0;width:100%;">
                                 Following <span id="following-count" class="badge badge-light"><%= details.following.length %></span>
                             </button>

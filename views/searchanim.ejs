@@ -25,6 +25,30 @@
     #default-search {
       min-height: 75vh;
     }
+
+    ::placeholder {
+      color: white;
+      opacity: 1;
+      /* Firefox */
+    }
+
+    :-ms-input-placeholder {
+      /* Internet Explorer 10-11 */
+      color: white;
+    }
+
+    ::-ms-input-placeholder {
+      /* Microsoft Edge */
+      color: white;
+    }
+
+    input[type="text"] {
+      color: white;
+    }
+
+    .polaroid {
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
   </style>
 
 </head>
@@ -32,7 +56,7 @@
 <body>
 
   <div class="container-fluid p-5 bg-dark input-group">
-    <input type="text" id="search-box" placeholder="Search..."
+    <input type="text" id="search-box" placeholder="Search Anime"
       class="border border-dark rounded-left border-0 bg-secondary pl-2" autofocus>
     <button class="border border-dark rounded-right border-0 bg-secondary" id="search-button"><img src="search.png"
         alt="Search" height="35" width="35" /></button>
@@ -47,38 +71,39 @@
     <img id="loader" src="loader.gif" alt="Loading..." />
   </div>
 
-  <div id="display-container" class="container-fluid d-flex justify-content-around">
+  <div id="display-container" class="container-fluid d-flex justify-content-around" style="margin:0px">
     <div id="default-search" class="d-flex align-items-center justify-content-center">
       <p class="h6 text-muted">Your search will appear here...</p>
     </div>
 
-    
+
   </div>
 
 
-   
-    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalCenterTitle">Select the List</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <select id="opt">
-              
-            </select>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button id="save" type="button" class="btn btn-primary">Save changes</button>
-          </div>
+
+  <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalCenterTitle">Select the List</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <select id="opt">
+
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button id="save" type="button" class="btn btn-primary">Add To List</button>
         </div>
       </div>
     </div>
- 
+  </div>
+
 
 
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"

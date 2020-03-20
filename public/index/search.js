@@ -25,10 +25,10 @@ $(document).ready(function () {
         console.log(data);
         $("#loader").hide(0);
         $('#display-container').html("");
-        $('#display-container').append("<form name='f1' action='/showprofile' method='POST' class='row' id='test'></form>");
+        $('#display-container').append("<form name='f1' action='/showprofile' method='POST' class='row' id='test' style='margin-left:10px;margin-right:10px;'></form>");
         data.forEach(user=>{
-          var txt=`<span class="card col-6 col-md-3" style="width: 18rem;">
-          <img class="card-img-top" src=`+user.profilePic+` alt="Card image cap">
+          var txt=`<span class="card col-6 col-md-2 polaroid" style="width: 18rem;margin-right:5px;padding:0">
+          <img class="card-img-top" src=`+user.profilePic+` alt="Card image cap" height="225">
           <span class="card-body">
             <center><button class="card-title makebuttonlink" style="cursor:pointer;" onclick="this.form.submit()" value=`+user._id+` name='hello'>`+user.userName+`</button></center>
           </span>

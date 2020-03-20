@@ -23,6 +23,9 @@
             text-decoration: none;
             cursor: pointer;
         }
+        .polaroid {
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
     </style>
 </head>
 
@@ -35,15 +38,17 @@
                     onclick=show("<%= list.listname %>")><%= list.listname %></button>
                 <% }); %>
             </div><br><br>
-            <form action="/deleteListItems" method="POST">
-                <button type="submit" class="btn btn-outline-primary">Update List</button><br><br>
                 <div id="list">
                     <% listx.forEach(function(list){ %>
-                    <div class="row" style="display: none;" id=<%= list.listname %>>
+                    <form action="/deleteListItems/<%= list.listname %>" method="POST">
+                    <div  id="<%= list.listname %>" style="display: none;">
+                    <input type="text" class="form-control" placeholder="Enter The Name Of List" name="<%= list.listname %>" value="<%= list.listname %>" style="width:30%;"><br>
+                    <button type="submit" class="btn btn-outline-primary">Update <%= list.listname %></button><br><br>
+                    <div class="row">
                         <% list.lists.forEach(function(temp){ %>
-                        <span class="card col-2 col-md-2" style="width: 18rem;">
+                        <span class="card col-2 col-md-2 polaroid" style="width: 18rem;padding:0px;margin-right:10px;margin-bottom:10px;">
                             <img class="card-img-top" src=<%= temp.image_url %> alt="Card image cap"
-                                style="height:25rem;">
+                                height="225">
                             <span class="card-body">
                                 <center><button class="card-title makebuttonlink" style="cursor:pointer;"><input
                                             type="checkbox"
@@ -53,10 +58,12 @@
                         </span>
                         <% }); %>
                     </div>
+                    </div>
+                    </form>
                     <% }); %>
                 </div>
-            </form>
         </center>
+        <div id="nores" style="position: absolute;height: 100%;width: 100%;margin: 0;left: 0;padding-top: 100px;"><center>No List Selected</center></div>
     </div>
 
     <!-- Optional JavaScript -->
@@ -75,11 +82,16 @@
         var info;
         var currentList = "";
         function show(txt) {
+            $("#nores").html("<center>No Anime Added</center>");
             //console.log(txt);
             currentList = txt;
             for (i in info.listx) {
                 //console.log(i,info.listx[i].listname);
                 if (info.listx[i].listname == txt) {
+                    if(info.listx[i].lists.length==0)
+                    $("#nores").show();
+                    else
+                    $("#nores").hide();
                     document.getElementById(info.listx[i].listname).style.display = "";
                     console.log("btn" + info.listx[i].listname);
                     $("#btn" + info.listx[i].listname).addClass("active");

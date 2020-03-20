@@ -18,7 +18,7 @@ $("#save").click(function(){
   console.log($("#opt").val());
   $.post('/add',{id:id,img:image,title:title,listvalue:$("#opt").val()},function(data,res){
     if(data)
-    $('#exampleModalCenter').modal('hide')
+    $('#exampleModalCenter').modal('hide');
   });
 });
 }
@@ -86,8 +86,14 @@ $(document).ready(function () {
       data.results.forEach(function (item) {
         //content += object.hd + object.hi + item.image_url + object.ti + object.ht + item.title + object.tt + object.hb + item.mal_id +','+item.image_url+object.tb + object.td;
         //console.log(content);
-        content+=`<div class='list-group col-2'><img style='height:20rem' src='${item.image_url}'><p>${item.title}</p>
-        <button class='btn btn-outline-primary' onclick='add(${item.mal_id},"${item.image_url}","${item.title}")'>Add</button></div>`
+        content+=`<span class="card col-6 col-md-2 polaroid" style="width: 18rem;margin-right:5px;margin-bottom:10px;padding:0">
+        <img class="card-img-top" src='${item.image_url}' alt="Card image cap" height="225">
+        <span class="card-body">
+          <center><p>${item.title}</p><button class="btn btn-outline-primary" style="cursor:pointer;width:70%;" onclick='add(${item.mal_id},"${item.image_url}","${item.title}")'>Add</button></center>
+        </span>
+</span>`;
+        /*content+=`<div class='list-group col-2 polaroid'><img style='height:20rem' src='${item.image_url}'><p>${item.title}</p>
+        <button class='btn btn-outline-primary' onclick='add(${item.mal_id},"${item.image_url}","${item.title}")'>Add</button></div>`*/
       });      
       $("#loader").hide(250);
       $("#next-button").show(0);

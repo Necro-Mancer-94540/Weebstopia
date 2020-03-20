@@ -10,6 +10,11 @@
     <!------ Include the above in your HEAD tag ---------->
     <link rel="stylesheet" href="profile.css">
     <title>Document</title>
+    <style>
+        .polaroid {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        }
+    </style>
 </head>
 
 <body>
@@ -21,7 +26,7 @@
                 <li class="nav-item dropdown mr-2">
                     <a class="nav-item" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">
-                        <img src="<%= details.profilePic %>" width="50" height="50" style="border-radius: 50%;">
+                        <img class="polaroid" src="<%= details.profilePic %>" width="50" height="50" style="border-radius: 50%;">
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="position: absolute;left:-90px;">
                         <a class="dropdown-item" href="/settings">Settings</a>
@@ -33,7 +38,8 @@
     </nav>
     <div class="jumbotron jumbotron-fluid">
         <div class="row">
-            <div class="col-2" style="margin-left: 70px;"><img src="<%= details.profilePic %>" width="200" height="200" style="border-radius: 50%;"></div>
+            <div class="col-2" style="margin-left: 70px;"><img class="polaroid" src="<%= details.profilePic %>" width="200" height="200"
+                    style="border-radius: 50%;"></div>
             <div class="col-4">
                 <h1><%= details.userName %></h1>
                 <h3>Email : <%= details.email %></h3>
@@ -42,14 +48,16 @@
             <div class="col-4" style="margin-left:10%;">
                 <span style="position: absolute;right:0px">
                     <form action="/showfollowers" method="POST">
-                    <button type="submit" class="btn btn-primary" style="display: block;border-bottom-right-radius: 0;border-bottom-left-radius: 0;width:100%;">
-                        Followers <span class="badge badge-light"><%= details.followers.length %></span>
-                    </button>
+                        <button type="submit" class="btn btn-primary"
+                            style="display: block;border-bottom-right-radius: 0;border-bottom-left-radius: 0;width:100%;">
+                            Followers <span class="badge badge-light"><%= details.followers.length %></span>
+                        </button>
                     </form>
                     <form action="/showfollowing" method="POST">
-                    <button type="submit" class="btn btn-primary" style="border-top-right-radius: 0;border-top-left-radius: 0;width:100%;">
-                        Following <span class="badge badge-light"><%= details.following.length %></span>
-                    </button>
+                        <button type="submit" class="btn btn-primary"
+                            style="border-top-right-radius: 0;border-top-left-radius: 0;width:100%;">
+                            Following <span class="badge badge-light"><%= details.following.length %></span>
+                        </button>
                     </form>
                 </span>
             </div>
@@ -65,18 +73,18 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="/create-list" method="POST">
+                <div class="modal-body">
+                    <div id="showAlert">
+
+                    </div>
                     <div class="modal-body">
-                        <div class="modal-body">
-                            <input type="text" class="form-control" name="listID"
-                                placeholder="Enter The Name Of The List">
-                        </div>
+                        <input type="text" class="form-control" id="lstName" placeholder="Enter The Name Of The List">
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button id="save" type="submit" class="btn btn-primary">Save changes</button>
-                    </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button id="save" type="button" class="btn btn-success">Create</button>
+                </div>
             </div>
         </div>
     </div>
@@ -121,9 +129,49 @@
 
     <script>
         function showModal() {
-            console.log("clicked");
+            //console.log("clicked");
             $("#exampleModalCenter").modal("show");
         }
+
+        $("#save").click(function () {
+            //console.log($("#lstName").val());
+            var lst = $("#lstName").val();
+            //console.log(lst);
+            if (lst == "")
+                $("#showAlert").html(`<div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            Please Enter The Name of List
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>`);
+
+            else {
+                //console.log("clicked");
+                $.post("/create-list", {
+                    listID: lst
+                }, function (data,status) {
+                    console.log(data.message);
+                    if(data.message=="Already Exists")
+                    $("#showAlert").html(`<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            List Already Exists
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>`);
+
+                    if(data.message=="Updated")
+                    {
+                        $("#showAlert").html(`<div class="alert alert-success alert-dismissible fade show" role="alert">
+                            List Created
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>`);
+                        setTimeout(function(){ $('#exampleModalCenter').modal('hide'); }, 2000);
+                    }
+                });
+            }
+        });
     </script>
 </body>
 

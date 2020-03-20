@@ -189,7 +189,7 @@ app.post("/del", async function (req, res) {
             }
         });
     }
-    res.send("Get");
+    res.redirect("/deletelist");
 });
 
 
@@ -205,27 +205,34 @@ app.get("/editlist", function (req, res) {
     });
 });
 
-app.post("/deleteListItems", function (req, res) {
-    console.log(req.body);
-    detail.findOne({
-        _id: req.session.uid
-    }, 'list', async function (err, data) {
-        // delete in which? ind = 3
-        for (i in data.list) {
-            for (j in data.list[i].lists) {
-                if ((data.list[i].listname + data.list[i].lists[j].title) in req.body) {
-                    console.log("deleted");
-                    data.list[i].lists.splice(j, 1);
-                    // delete [j];
-                    console.log(j, data.list[i].lists);
-                }
+app.post("/deleteListItems/:lstName", function (req, res) {
+    console.log(req.body,req.params);
+    detail.findOne({_id:req.session.uid},'list',function(err,data){
+        console.log(data);
+        for(i in data.list){
+            console.log(data.list[i].listname);
+            if((data.list[i].listname==req.params.lstName)&&(data.list[i].listname!=req.body[req.params.lstName]))
+            {
+                data.list[i].listname=req.body[req.params.lstName];
+            }
+            for(j in data.list[i].lists)
+            {
+                if((req.params.lstName+data.list[i].lists[j].title) in req.body)
+                data.list[i].lists.splice(j, 1);
             }
         }
-        await detail.updateOne({
+        //console.log(data.list);
+        detail.updateOne({
             _id: req.session.uid
-        }, data);
+        }, data,function(err,d){
+            detail.findOne({
+                _id: req.session.uid
+            }, function(err,d1){
+                //console.log(d1.list);
+                res.redirect("/editlist");
+            });
+        });
     });
-    res.send("Done");
 });
 
 
@@ -235,7 +242,7 @@ app.post("/create-list", function (req, res) {
     console.log(req.body);
     detail.findOne({
         _id: req.session.uid
-    }, async function (err, data) {
+    }, function (err, data) {
         var flag = 0;
         for (i in data.list) {
             if (data.list[i].listname == req.body.listID) {
@@ -243,8 +250,11 @@ app.post("/create-list", function (req, res) {
                 break;
             }
         }
+        console.log(flag);
         if (!flag) {
-            await detail.updateOne({
+            console.log("here");
+            
+            detail.updateOne({
                 _id: req.session.uid
             }, {
                 $push: {
@@ -253,42 +263,27 @@ app.post("/create-list", function (req, res) {
                         lists: []
                     }
                 }
+            },function(err,d){
+                if(!err){
+                    res.send({message:"Updated"});
+                }
+                else{
+                    console.log(err);
+                }
             });
-            await detail.findOne({
+            /*await detail.findOne({
                 _id: req.session.uid
             }, function (err, d) {
                 console.log(d.list);
                 res.send("Test");
-            });
+            });*/
+        }
+        else{
+            res.send({message:"Already Exists"});
         }
     });
 });
 
-
-/*--------------------------show followers-------------------------
-
-app.post("/showfollowers", async function (req, res) {
-    var followers = [];
-    await detail.findOne({
-        _id: req.session.uid
-    }, function (err, data) {
-        data.followers.forEach(async element => {
-            await detail.findOne({
-                _id: element
-            }, function (err, fdata) {
-                followers.push({
-                    username: fdata.userName,
-                    image: fdata.profilePic
-                });
-            });
-        });
-    });
-    console.log(followers);
-    res.render("follow", {
-        info: followers,
-        status: "followers"
-    });
-});*/
 
 /*--------------------------show followers-------------------------*/
 
@@ -338,7 +333,7 @@ app.post("/showfollowing", async function (req, res) {
 
 /*--------------------------show followers not login-------------------------*/
 
-app.post("/show/:showfollowers", async function (req, res) {
+app.post("/showfollowers/:showfollowers", async function (req, res) {
     console.log(req.params,req.url);
     var followers = [];
     await detail.findOne({
@@ -361,11 +356,11 @@ app.post("/show/:showfollowers", async function (req, res) {
 
 /*--------------------------show following not login-------------------------*/
 
-app.post("/show/:showfollowing", async function (req, res) {
+app.post("/showfollowing/:showfollowing", async function (req, res) {
     console.log(req.params);
     var following = [];
     await detail.findOne({
-        _id: req.params.showfollowers
+        _id: req.params.showfollowing
     }, 'following').populate("following.user", "userName profilePic").exec(function (err, data) {
         if (data) {
             console.log(data.following);
@@ -480,7 +475,7 @@ app.post('/save-user', (req, res) => {
                     req.session.uun = newUser.userName;
                     req.session.upp = newUser.profilePic;
                     if (req.body.remember == 'true') {
-                        req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
+                        req.session.cookie.maxAge = 5 * 24 * 60 * 60 * 1000;
                     }
                     req.session.save(() => {
                         res.redirect('/');
@@ -521,7 +516,7 @@ app.post('/check-user', (req, res) => {
             req.session.uun = user.userName;
             req.session.upp = user.profilePic;
             if (req.body.remember == 'true') {
-                req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
+                req.session.cookie.maxAge = 5 * 24 * 60 * 60 * 1000;
             }
             req.session.save(() => {
                 res.redirect('/');

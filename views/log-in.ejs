@@ -7,6 +7,8 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1.0,initial-scale=1,user-scalable=yes">
   <script src="../script.js"></script>
   <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretty-checkbox@3.0/dist/pretty-checkbox.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
@@ -48,18 +50,25 @@
                     <input type="password" minlength="5" title="Passwords should be longer than 5 characters!"
                       class="_425fdea4 relative w-100 ma2 ml0 pv3 pl2 pr2 br2 black-70 ba b--black-10  " name="password"
                       value="" required>
-                  </div>
+                  </div><br>
                   <div class="dib fr mt1">
                     <a tabindex="-1" class="text-secondary" href="/forgot-password">
                       Forgot password?
                     </a>
                   </div>
-                  <div>
+                  <div class="pretty p-icon p-round p-pulse p-has-hover">
                     <input type="checkbox" value="true" name="remember">
-                    <label class="mt3  mb3 f5 fw6 black-70 " for="remember_me">
-                      Remember me
-                    </label>
+                    <div class="state p-primary">
+                        <i class="icon fa fa-check"></i>
+                        <label class="mt3  mb3 f5 fw6 black-70 " for="remember_me">
+                          Remember me
+                        </label>
+                    </div>
+                    <div class="state p-primary p-is-hover">
+                      <i class="icon fa fa-check"></i>
+                      <label class="mt3  mb3 f5 fw6 black-70 ">Remembered for 5 days</label>
                   </div>
+                </div><br><br>
                   <button type="submit"
                     class="_24a1e9c7 dab9924c br2 pv2 ph3 fw5 f5 tc button button-reset pointer ma2 truncate ml0 no-underline e64d5a00 w-100">Login
                   </button>

@@ -14,29 +14,37 @@
     </title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <style>
+        .polaroid {
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+    </style>
 </head>
 
 <body>
-    <div class="row">
-        <% if(status=="followers"){ %>
+    <div class="row" style="margin:0 10px;">
+        <% if((status=="followers")&&(info.length!=0)){ %>
         <% info.forEach(function(user){ %>
-        <div class="card col-2" style="width: 18rem;">
-            <img src="<%= user.img %>" class="card-img-top">
+        <div class="card col-2 polaroid" style="width: 18rem;padding:0px;margin-right:10px;margin-bottom:10px;">
+            <img src="<%= user.img %>" class="card-img-top" height="225">
             <div class="card-body">
-                <h5 class="card-title"><%= user.userName %></h5>
+                <center><h5 class="card-title"><%= user.userName %></h5></center>
             </div>
         </div>
         <% }); %>
         <% } %>
-        <% if(status=="following"){ %>
+        <% if((status=="following")&&(info.length!=0)){ %>
         <% info.forEach(function(user){ %>
-        <div class="card col-2" style="width: 18rem;">
-            <img src="<%= user.img %>" class="card-img-top">
+        <div class="card col-2 polaroid" style="width: 18rem;padding:0px;margin-right:10px;margin-bottom:10px;">
+            <img src="<%= user.img %>" class="card-img-top" height="225">
             <div class="card-body">
-                <h5 class="card-title"><%= user.userName %></h5>
+                <center><h5 class="card-title"><%= user.userName %></h5></center>
             </div>
         </div>
         <% }); %>
+        <% } %>
+        <% if(info.length==0){ %>
+            <div style="position: absolute;top:50%;left:45%;">No Result Found</div>
         <% } %>
     </div>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
