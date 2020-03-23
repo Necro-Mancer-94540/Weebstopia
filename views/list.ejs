@@ -34,14 +34,14 @@
         <center>
             <div class="row btn-group">
                 <% listx.forEach(function(list){ %>
-                    <button id="btn<%= list.listname %>" class="btn btn-outline-primary" role="group" onclick=show("<%= list.listname %>")><%= list.listname %></button>
+                    <button id="btn<%= list.list_id %>" class="btn btn-outline-primary" role="group" onclick=show(<%= list.list_id %>)><%= list.listname %></button>
                 <% }); %>
             </div>
         </center><br><br>
         <div id="nores" style="position: absolute;height: 100%;width: 100%;margin: 0;left: 0;padding-top: 100px;"><center>No List Selected</center></div>
             <div id="list">
             <% listx.forEach(function(list){ %>
-                <div class="row" style="display: none;" id=<%= list.listname %>>
+                <div class="row" style="display: none;" id=<%= list.list_id %>>
                 <% list.lists.forEach(function(temp){ %>
                 <span class="card col-2 col-md-2 polaroid" style="width: 18rem;padding:0px;margin-right:10px;margin-bottom:10px;">
                     <img class="card-img-top" src=<%= temp.image_url %> alt="Card image cap" style=width:100%;" height="225">
@@ -75,19 +75,19 @@
             for(i in info.listx)
             {
                 //console.log(i,info.listx[i].listname);
-                if(info.listx[i].listname==txt){
+                if(info.listx[i].list_id==txt){
                     if(info.listx[i].lists.length==0)
                     $("#nores").show();
                     else
                     $("#nores").hide();
-                    document.getElementById(info.listx[i].listname).style.display="";
-                    console.log("btn"+info.listx[i].listname);
-                    $("#btn"+info.listx[i].listname).addClass("active");
+                    document.getElementById(info.listx[i].list_id).style.display="";
+                    console.log("btn"+info.listx[i].list_id);
+                    $("#btn"+info.listx[i].list_id).addClass("active");
 
                 }else{
-                    document.getElementById(info.listx[i].listname).style.display="none";
-                    console.log("btn"+info.listx[i].listname);
-                    $("#btn"+info.listx[i].listname).removeClass("active");
+                    document.getElementById(info.listx[i].list_id).style.display="none";
+                    console.log("btn"+info.listx[i].list_id);
+                    $("#btn"+info.listx[i].list_id).removeClass("active");
                 }
             }
         }

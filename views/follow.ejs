@@ -16,37 +16,50 @@
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <style>
         .polaroid {
-      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    }
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        }
     </style>
 </head>
 
-<body>
-    <div class="row" style="margin:0 10px;">
-        <% if((status=="followers")&&(info.length!=0)){ %>
-        <% info.forEach(function(user){ %>
+<body onload="check()">
+    <br><br>
+    <center>
+        <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button"
+                class="btn btn-outline-primary" id="followers">Followers</button>
+            <button type="button"
+                class="btn btn-outline-primary" id="following">Following</button>
+        </div>
+    </center>
+    <% if(infofl.length!=0){ %>
+    <div class="row" style="margin:0 10px;display:none;" id="fl1">
+        <% infofl.forEach(function(user){ %>
         <div class="card col-2 polaroid" style="width: 18rem;padding:0px;margin-right:10px;margin-bottom:10px;">
             <img src="<%= user.img %>" class="card-img-top" height="225">
             <div class="card-body">
-                <center><h5 class="card-title"><%= user.userName %></h5></center>
+                <center>
+                    <h5 class="card-title"><%= user.userName %></h5>
+                </center>
             </div>
         </div>
         <% }); %>
-        <% } %>
-        <% if((status=="following")&&(info.length!=0)){ %>
-        <% info.forEach(function(user){ %>
-        <div class="card col-2 polaroid" style="width: 18rem;padding:0px;margin-right:10px;margin-bottom:10px;">
-            <img src="<%= user.img %>" class="card-img-top" height="225">
-            <div class="card-body">
-                <center><h5 class="card-title"><%= user.userName %></h5></center>
-            </div>
-        </div>
-        <% }); %>
-        <% } %>
-        <% if(info.length==0){ %>
-            <div style="position: absolute;top:50%;left:45%;">No Result Found</div>
-        <% } %>
     </div>
+    <% } %>
+    <% if(infofw.length!=0){ %>
+    <div class="row" style="margin:0 10px;display:none;" id="fw1">
+        <% infofw.forEach(function(user){ %>
+        <div class="card col-2 polaroid" style="width: 18rem;padding:0px;margin-right:10px;margin-bottom:10px;">
+            <img src="<%= user.img %>" class="card-img-top" height="225">
+            <div class="card-body">
+                <center>
+                    <h5 class="card-title"><%= user.userName %></h5>
+                </center>
+            </div>
+        </div>
+        <% }); %>
+    </div>
+    <% } %>
+    <div id="nores" style="position: absolute;top:50%;left:46%;display: none;">No Result Found</div>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
         integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
     </script>
@@ -55,6 +68,44 @@
     </script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+    </script>
+    <script>
+        function check(){
+            var stat="<%= status %>";
+            if(stat=="followers"){
+                if("<%= infofl %>".length==0)
+                $("#nores").show();
+                $("#followers").addClass("active");
+                $("#fl1").show();
+            }else{
+                if("<%= infofw %>".length==0)
+                $("#nores").show();
+                $("#fw1").show();
+                $("#following").addClass("active");
+            }
+        }
+
+        $("#followers").click(function(){
+            if("<%= infofl %>".length==0)
+            $("#nores").show();
+            else
+            $("#nores").hide();
+            $("#followers").addClass("active");
+            $("#following").removeClass("active");
+            $("#fl1").show();
+            $("#fw1").hide();
+        });
+
+        $("#following").click(function(){
+            if("<%= infofw %>".length==0)
+            $("#nores").show();
+            else
+            $("#nores").hide();
+            $("#following").addClass("active");
+            $("#followers").removeClass("active");
+            $("#fl1").hide();
+            $("#fw1").show();
+        });
     </script>
 
 </body>

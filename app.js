@@ -211,14 +211,16 @@ app.post("/deleteListItems/:lstName", function (req, res) {
         console.log(data);
         for(i in data.list){
             console.log(data.list[i].listname);
-            if((data.list[i].listname==req.params.lstName)&&(data.list[i].listname!=req.body[req.params.lstName]))
+            if(data.list[i].listname==req.params.lstName)
             {
+                if(data.list[i].listname!=req.body[req.params.lstName])
                 data.list[i].listname=req.body[req.params.lstName];
-            }
-            for(j in data.list[i].lists)
-            {
-                if((req.params.lstName+data.list[i].lists[j].title) in req.body)
-                data.list[i].lists.splice(j, 1);
+                for(j in data.list[i].lists)
+                {
+                    if((req.params.lstName+data.list[i].lists[j].title) in req.body)
+                    data.list[i].lists.splice(j, 1);
+                }
+                break;
             }
         }
         //console.log(data.list);
@@ -259,6 +261,7 @@ app.post("/create-list", function (req, res) {
             }, {
                 $push: {
                     list: {
+                        list_id:String(data.list.length+1),
                         listname: req.body.listID,
                         lists: []
                     }
@@ -288,20 +291,25 @@ app.post("/create-list", function (req, res) {
 /*--------------------------show followers-------------------------*/
 
 app.post("/showfollowers", async function (req, res) {
-    var followers = [];
+    var followers = [],following = [];
     await detail.findOne({
         _id: req.session.uid
-    }, 'followers').populate("followers.user", "userName profilePic").exec(function (err, data) {
+    }, 'followers following').populate("followers.user following.user", "userName profilePic").exec(function (err, data) {
         if (data) {
-            console.log(data.followers);
+            //console.log(data.followers);
             data.followers.forEach((ele)=>{
                 followers.push({userName:ele.user.userName,img:ele.user.profilePic});
                 console.log(followers);
             });
-            console.log(followers);
+            data.following.forEach((ele)=>{
+                following.push({userName:ele.user.userName,img:ele.user.profilePic});
+                console.log(following);
+            });
+            //console.log(followers);
     res.render("follow", {
-         info: followers,
-         status: "followers"
+         infofl: followers,
+         infofw:following,
+         status:"followers"
      });
         }
     });
@@ -310,19 +318,24 @@ app.post("/showfollowers", async function (req, res) {
 /*--------------------------show following-------------------------*/
 
 app.post("/showfollowing", async function (req, res) {
-    var following = [];
+    var followers = [],following = [];
     await detail.findOne({
         _id: req.session.uid
-    }, 'following').populate("following.user", "userName profilePic").exec(function (err, data) {
+    }, 'following followers').populate("following.user followers.user", "userName profilePic").exec(function (err, data) {
         if (data) {
-            console.log(data.following);
+           // console.log(data.following);
+            data.followers.forEach((ele)=>{
+                followers.push({userName:ele.user.userName,img:ele.user.profilePic});
+                console.log(followers);
+            });
             data.following.forEach((ele)=>{
                 following.push({userName:ele.user.userName,img:ele.user.profilePic});
                 console.log(following);
             });
-            console.log(following);
+            //console.log(following);
     res.render("follow", {
-         info: following,
+        infofl:followers,
+         infofw: following,
          status: "following"
      });
         }
@@ -335,19 +348,24 @@ app.post("/showfollowing", async function (req, res) {
 
 app.post("/showfollowers/:showfollowers", async function (req, res) {
     console.log(req.params,req.url);
-    var followers = [];
+    var followers = [],following = [];
     await detail.findOne({
         _id: req.params.showfollowers
-    }, 'followers').populate("followers.user", "userName profilePic").exec(function (err, data) {
+    }, 'followers following').populate("followers.user following.user", "userName profilePic").exec(function (err, data) {
         if (data) {
             console.log(data.followers);
             data.followers.forEach((ele)=>{
                 followers.push({userName:ele.user.userName,img:ele.user.profilePic});
                 console.log(followers);
             });
+            data.following.forEach((ele)=>{
+                following.push({userName:ele.user.userName,img:ele.user.profilePic});
+                console.log(following);
+            });
             console.log(followers);
     res.render("follow1", {
-         info: followers,
+         infofl: followers,
+         infofw:following,
          status: "followers"
      });
         }
@@ -358,19 +376,24 @@ app.post("/showfollowers/:showfollowers", async function (req, res) {
 
 app.post("/showfollowing/:showfollowing", async function (req, res) {
     console.log(req.params);
-    var following = [];
+    var following = [],followers = [];
     await detail.findOne({
         _id: req.params.showfollowing
-    }, 'following').populate("following.user", "userName profilePic").exec(function (err, data) {
+    }, 'following followers').populate("following.user followers.user", "userName profilePic").exec(function (err, data) {
         if (data) {
             console.log(data.following);
+            data.followers.forEach((ele)=>{
+                followers.push({userName:ele.user.userName,img:ele.user.profilePic});
+                console.log(followers);
+            });
             data.following.forEach((ele)=>{
                 following.push({userName:ele.user.userName,img:ele.user.profilePic});
                 console.log(following);
             });
             console.log(following);
     res.render("follow1", {
-         info: following,
+        infofl: followers,
+        infofw:following,
          status: "following"
      });
         }

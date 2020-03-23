@@ -99,6 +99,7 @@
             <form action="/search-user" method="get">
                 <button class="btn btn-outline-primary" type="submit" style="border-radius: 0;">Search User</button>
             </form>
+            <a class="btn btn-outline-primary" href="https://manga-downloader.herokuapp.com/">Manga Downloader</a>
             <form action="/showlist" method="get">
                 <button class="btn btn-outline-primary" type="submit" style="border-radius: 0;">Show
                     List</button>
@@ -138,13 +139,12 @@
             var lst = $("#lstName").val();
             //console.log(lst);
             if (lst == "")
-                $("#showAlert").html(`<div class="alert alert-warning alert-dismissible fade show" role="alert">
+                $("#showAlert").html(`<div id="closeAlert" class="alert alert-warning alert-dismissible fade show" role="alert">
                             Please Enter The Name of List
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                               <span aria-hidden="true">&times;</span>
                             </button>
                         </div>`);
-
             else {
                 //console.log("clicked");
                 $.post("/create-list", {
@@ -152,7 +152,7 @@
                 }, function (data,status) {
                     console.log(data.message);
                     if(data.message=="Already Exists")
-                    $("#showAlert").html(`<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    $("#showAlert").html(`<div id="closeAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
                             List Already Exists
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                               <span aria-hidden="true">&times;</span>
@@ -161,13 +161,17 @@
 
                     if(data.message=="Updated")
                     {
-                        $("#showAlert").html(`<div class="alert alert-success alert-dismissible fade show" role="alert">
+                        $("#showAlert").html(`<div id="closeAlert" class="alert alert-success alert-dismissible fade show" role="alert">
                             List Created
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                               <span aria-hidden="true">&times;</span>
                             </button>
                         </div>`);
-                        setTimeout(function(){ $('#exampleModalCenter').modal('hide'); }, 2000);
+                        $("#lstName").val("");
+                        setTimeout(function(){ 
+                            //$('#exampleModalCenter').modal('hide'); 
+                            $("#closeAlert").alert('close')
+                            }, 3000);
                     }
                 });
             }

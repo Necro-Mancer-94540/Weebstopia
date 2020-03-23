@@ -30,8 +30,8 @@
 
 <body onload="del()">
     <center>
-        <form action="/del" method="POST" id="f1">
             <div>
+                <form action="/del" method="POST" id="f1">
                 <table id="checkList">
                     <tr>
                         <th>S.no</th>
@@ -40,9 +40,28 @@
                     </tr>
                 </table>
             </div><br><br>
-            <button id="delList" type="submit" class="btn btn-danger">Delete</button><br><br>
-        </form>
+            <button id="alert" type="button" class="btn btn-danger">Delete</button><br><br>
     </center>
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Alert!!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete the list?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                <button id="delList" type="submit" class="btn btn-success">Yes</button></form>
+            </div>
+        </div>
+    </div>
+</div>
 
 
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
@@ -85,6 +104,10 @@
         });
         $("#delList").click(function(){
             document.getElementById("f1").submit();
+        });
+
+        $("#alert").click(function(){
+            $("#exampleModalCenter").modal('show');
         });
     </script>
 </body>
